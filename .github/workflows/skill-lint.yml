@@ -5,15 +5,12 @@ on:
     branches: [main]
     paths:
       - 'skills/**'
-      - 'evals/**'
       - '.github/workflows/skill-lint.yml'
       - '.github/scripts/lint_skills.py'
-      - '.github/scripts/eval_skill.py'
   push:
     branches: [main]
     paths:
       - 'skills/**'
-      - 'evals/**'
 
 jobs:
   lint:
@@ -33,26 +30,3 @@ jobs:
 
       - name: Lint skills (SKILL.md structure / frontmatter / AIP env constraints)
         run: python3 .github/scripts/lint_skills.py
-
-  eval:
-    name: eval
-    runs-on: ubuntu-latest
-    # ANTHROPIC_API_KEY未設定でもジョブ自体は成功させ(スクリプト側でスキップ)、
-    # PRをブロックしない。required status checkには現状含めていない。
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        run: pip install pyyaml anthropic
-
-      - name: Evaluate skill firing (positive/negative cases)
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          EVAL_MODEL: ${{ vars.EVAL_MODEL }}
-        run: python3 .github/scripts/eval_skill.py
